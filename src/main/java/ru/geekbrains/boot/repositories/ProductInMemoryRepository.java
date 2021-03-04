@@ -35,7 +35,7 @@ public class ProductInMemoryRepository implements ProductRepository {
     }
 
     @Override
-    public Product get(int id) {
+    public ru.geekbrains.boot.entities.Product get(int id) {
         for (Product product : products) {
             if (product.getId() == id) {
                 return product;
@@ -45,7 +45,7 @@ public class ProductInMemoryRepository implements ProductRepository {
     }
 
     @Override
-    public List<Product> getAll() {
+    public List<ru.geekbrains.boot.entities.Product> getAll() {
         products.sort(Comparator.comparingInt(Product::getId));
         return Collections.unmodifiableList(products);
     }

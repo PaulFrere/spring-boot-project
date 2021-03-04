@@ -5,19 +5,19 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import ru.geekbrains.boot.entities.Product;
+import ru.geekbrains.boot.entities.Customer;
 
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
 @Component
 @Primary
-public class ProductDatabaseRepository implements ProductRepository {
+public class CustomerDatabaseRepository implements CustomerRepository {
 
     private final SessionFactory factory;
 
     @Autowired
-    public ProductDatabaseRepository(EntityManagerFactory factory) {
+    public CustomerDatabaseRepository(EntityManagerFactory factory) {
         if (factory.unwrap(SessionFactory.class) == null) {
             throw new NullPointerException("factory is not a hibernate factory");
         }
@@ -25,45 +25,44 @@ public class ProductDatabaseRepository implements ProductRepository {
     }
 
     @Override
-    public void create(String title, float cost) {
+    public void create(String name) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            Product product = new Product(title, cost);
-            session.save(product);
+            Customer customer = new Customer(name);
+            session.save(customer);
             session.getTransaction().commit();
         }
     }
 
     @Override
-    public Product get(int id) {
-        Product product;
+    public Customer get(int id) {
+        Customer customer;
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            product = session.get(Product.class, id);
+            customer = session.get(Customer.class, id);
             session.getTransaction().commit();
         }
-        return product;
+        return customer;
     }
 
     @Override
-    public List<Product> getAll() {
-        List<Product> products;
+    public List<Customer> getAll() {
+        List<Customer> customers;
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            products = session.createQuery("from Product", Product.class).getResultList();
+            customers = session.createQuery("from Customer", Customer.class).getResultList();
             session.getTransaction().commit();
         }
-        return products;
+        return customers;
     }
 
     @Override
-    public void update(int id, String title, float cost) {
+    public void update(int id, String name) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            Product product = session.get(Product.class, id);
-            if (product != null) {
-                product.setTitle(title);
-                product.setCost(cost);
+            Customer customer = session.get(Customer.class, id);
+            if (customer != null) {
+                customer.setName(name);
             }
             session.getTransaction().commit();
         }
@@ -73,25 +72,19 @@ public class ProductDatabaseRepository implements ProductRepository {
     public void delete(int id) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            Product product = session.get(Product.class, id);
-            if (product != null) {
-                session.delete(product);
+            Customer customer = session.get(Customer.class, id);
+            if (customer != null) {
+                session.delete(customer);
             }
             session.getTransaction().commit();
         }
     }
 
     @Override
-    public void save(ru.geekbrains.boot.model.Product product) {
-
-    }
-
-
-    @Override
-    public void save(Product product) {
+    public void save(Customer customer) {
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            session.save(product);
+            session.save(customer);
             session.getTransaction().commit();
         }
     }
