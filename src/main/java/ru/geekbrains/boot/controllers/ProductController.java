@@ -1,51 +1,54 @@
 package ru.geekbrains.boot.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.boot.model.Product;
 import ru.geekbrains.boot.services.ProductService;
 
-import java.util.Optional;
+import java.util.List;
 
 @Controller
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
+    @Autowired
     private ProductService productService;
 
-    public void ProductsController(ProductService productService) {
-        this.productService = productService;
+    @GetMapping
+    public List<Product> getAll() {
+        return productService.getAll();
     }
 
-    @GetMapping("/all")
-    public String getAll(Model model) {
-        model.addAttribute("products", productService.getAll());
-        return "all_products";
+    @GetMapping("/cost_between")
+    public List<Product> getAllBetween(@RequestParam float first, @RequestParam float second) {
+        return productService.getAllByCostBetween(first, second);
+    }
+
+    @GetMapping("/cost_less")
+    public List<Product> getAllLess(@RequestParam float cost) {
+        return productService.getAllByCostIsLessThanEqual(cost);
+    }
+
+    @GetMapping("/cost_greater")
+    public List<Product> getAllGreater(@RequestParam float cost) {
+        return productService.getAllByCostGreaterThanEqual(cost);
     }
 
     @GetMapping("/{id}")
-    public String getProductById(@PathVariable String id, Model model) {
-        Optional<Product> product = productService.get(Integer.parseInt(id));
-        if (product.isPresent()) {
-            model.addAttribute("product", product.get());
-            return "product";
-        } else {
-            model.addAttribute("product", id);
-            return "product_not_found";
-        }
+    public Product getById(@PathVariable Long id) {
+        return productService.getById(id);
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteProductById(@PathVariable Integer id) {
+
+    @PostMapping
+    public Product add(@RequestBody Product product) {
+        return productService.add(product);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
         productService.delete(id);
-        return "redirect:/products/all";
-    }
-
-    @PostMapping("/add")
-    public String addNewProduct(@ModelAttribute Product product) {
-        productService.save(product);
-        return "redirect:/products/all";
     }
 }

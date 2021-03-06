@@ -1,12 +1,11 @@
-DROP TABLE IF EXISTS products CASCADE;
-create table if not exists products
+create table products
 (
-    id    bigint auto_increment primary key,
-    title varchar(128)   null,
-    cost  decimal(10, 2) null
+    id    bigint primary key,
+    title varchar(255),
+    cost  decimal(10, 2)
 );
-INSERT INTO products (title, cost)
-VALUES ('Phone', 1500),
+insert into products (title, cost)
+values ('Phone', 1500),
        ('Notebook', 50000),
        ('Tablet', 10000),
        ('Bookkeeper', 8000),
