@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.geekbrains.boot.model.Category;
 import ru.geekbrains.boot.model.Product;
 
+
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findProductByCostLessThan(float cost, Pageable pageable);
@@ -17,4 +18,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findProductByTitleContainsIgnoreCase(String s, Pageable pageable);
 
     Page<Product> findProductByCategory(Category category, Pageable pageable);
+
+    Page<Product> findProductByIdIgnoreCase(Integer productId);
 }
