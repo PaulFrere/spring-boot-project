@@ -1,19 +1,17 @@
 package ru.geekbrains.boot.exceptions;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import java.util.Date;
 
-import java.time.LocalDateTime;
-
-@AllArgsConstructor
 @Data
-@RequiredArgsConstructor
 public class SpringShopError {
-
     private int status;
-
     private String message;
+    private Date timestamp;
 
-    private LocalDateTime date;
+    public SpringShopError(int status, String message) {
+        this.status = status;
+        this.message = message;
+        this.timestamp = new Date();
+    }
 }

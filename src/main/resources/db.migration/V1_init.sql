@@ -1,11 +1,40 @@
+create table role_table
+(
+    id   int      not null
+        constraint role_table_pk
+            primary key,
+    name varchar(20) not null
+);
+
+create table shop_users
+(
+    id       int not null
+        constraint user_table_pk
+            primary key,
+    login    varchar(50),
+    password varchar(500),
+    role_id  integer
+        constraint shop_users_role_table_id_fk
+            references role_table
+);
+
+create
+    unique index shop_users_login_uindex
+    on shop_users (login);
+
+insert into role_table(name)
+values ('ROLE_ADMIN');
+insert into role_table(name)
+values ('ROLE_USER');
+
+
 create table categories
 (
-    id bigint not null
-        constraint categories_pkey
-            primary key,
-    name varchar(255)
+    id    int primary key,
+    title varchar(255)
 );
-insert into categories (name)
+
+insert into categories (title)
 values ('Комплектующие'),
        ('Аксессуары'),
        ('Продукция');
@@ -13,13 +42,12 @@ values ('Комплектующие'),
 
 create table products
 (
-    id    bigint primary key,
-    title varchar(255),
-    cost  decimal(10, 2)
-        category_id bigint
-        constraint categories__id
-        references categories
+    id          int primary key,
+    title       varchar(255),
+    category_id int,
+    cost        decimal(10, 2)
 );
+
 insert into products (title, cost, category_id)
 values ('Phone', 1500, 3),
        ('Notebook', 50000, 3),

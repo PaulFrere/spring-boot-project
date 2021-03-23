@@ -1,77 +1,82 @@
 package ru.geekbrains.boot.controllers;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.boot.exceptions.ProductNotFoundException;
 import ru.geekbrains.boot.model.Product;
 import ru.geekbrains.boot.model.ProductDto;
+import ru.geekbrains.boot.model.SortProduct;
+import ru.geekbrains.boot.repositories.ProductSpecifications;
 import ru.geekbrains.boot.services.ProductService;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/api/v1/products")
-@RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/v1/products")
 public class ProductController {
-    @Autowired
+
     private final ProductService productService;
 
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
     @GetMapping
+    public ResponseEntity<List<ProductDto>> getAll(@RequestParam MultiValueMap<String, String> params,
+                                                   @RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "10") int size,
+                                                   @RequestParam(defaultValue = "ASC") SortProduct costSortDirection,
+                                                   @RequestParam(defaultValue = "ASC") SortProduct titleSortDirection,
+                                                   @RequestParam(defaultValue = "TITLE") SortProduct mainSort
+    ) {
 
-    public List<ProductDto> getAllProducts(@PageableDefault(size = 10, page = 0, sort = "id") Pageable pageable) {
-        return productService.getAllProducts(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
-    }
+        if (page <= 1) {
+            page = 0;
+        } else {
+            page--;
+        }
 
-    @GetMapping(params = "category")
-    public List<ProductDto> getAllProductsInCategory(@PageableDefault(size = 10, page = 0, sort = "id") Pageable pageable, Long category) {
-        return productService.getAllProductsInCategory(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort(), category);
-    }
+        Sort.Order costSorting = new Sort.Order(Sort.Direction.valueOf(costSortDirection.name()), "cost");
+        Sort.Order titleSorting = new Sort.Order(Sort.Direction.valueOf(titleSortDirection.name()), "title");
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProductDto addProduct(@RequestBody ProductDto productDto) {
-        return productService.addOrUpdateProduct(productDto);
-    }
+        Sort resultSort;
+        if (mainSort == SortProduct.COST) {
+            resultSort = Sort.by(costSorting, titleSorting);
+        } else {
+            resultSort = Sort.by(titleSorting, costSorting);
+        }
 
-    @GetMapping(params = {"minCost", "maxCost"})
-    public List<ProductDto> getProductsBetweenCost(float minCost, float maxCost, Pageable pageable) {
-        return productService.getProductsBetweenCost(minCost, maxCost, pageable);
-    }
+        Specification<Product> spec = ProductSpecifications.build(params);
 
-    @GetMapping(params = "titleContains")
-    public List<ProductDto> getProductByTitleContains(String titleContains, Pageable pageable) {
-        return productService.getProductByTitleContains(titleContains, pageable);
-    }
+        Page<ProductDto> products = productService.getAll(spec, page, size, resultSort);
 
-    @GetMapping(params = "minCost")
-    public List<ProductDto> getProductsMoreExpensiveThan(float minCost, Pageable pageable) {
-        return productService.getProductsExpensiveThan(minCost, pageable);
-    }
-
-    @GetMapping(params = "maxCost")
-    public List<ProductDto> getProductsCheaperThan(float maxCost, Pageable pageable) {
-        return productService.getProductsCheaperThan(maxCost, pageable);
+        if (products.getTotalPages() <= page) {
+            throw new ProductNotFoundException("Maximum page is " + products.getTotalPages());
+        }
+        return new ResponseEntity<>(products.getContent(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ProductDto getOneProduct(@PathVariable Long id) {
-        return productService.getProduct(id);
+    public ProductDto getById(@PathVariable Long id) {
+        return productService.getById(id);
     }
 
-    @PutMapping
-    public ProductDto updateProduct(@RequestBody ProductDto productDto) {
-        return productService.addOrUpdateProduct(productDto);
+    @PostMapping
+    public ProductDto add(@RequestBody ProductDto product) {
+        return productService.add(product);
     }
 
-    @DeleteMapping
-    public void deleteProduct(@RequestParam Long id) {
-        productService.deleteProduct(id);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        productService.delete(id);
     }
+
 }
+

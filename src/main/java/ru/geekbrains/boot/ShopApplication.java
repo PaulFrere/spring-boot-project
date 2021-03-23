@@ -1,3 +1,5 @@
+package ru.geekbrains.boot;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -6,9 +8,9 @@ import org.springframework.context.annotation.Bean;
 import static org.modelmapper.config.Configuration.AccessLevel.PRIVATE;
 
 @SpringBootApplication
-public class Application {
+public class ShopApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(ShopApplication.class, args);
     }
     @Bean
     public ModelMapper modelMapper() {
