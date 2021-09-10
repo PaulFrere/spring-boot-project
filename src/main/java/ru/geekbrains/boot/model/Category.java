@@ -1,23 +1,22 @@
 package ru.geekbrains.boot.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
+
+
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
-@Table(name="categories")
+@Table(name = "categories")
 public class Category {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
-    private String name;
-
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
+    @NonNull
+    private String title;
 }
