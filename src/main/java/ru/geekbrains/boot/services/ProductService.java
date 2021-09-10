@@ -88,6 +88,11 @@ public class ProductService {
     }
 
     public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        productRepository.deleteById(Long.valueOf(id));
+    }
+
+    public List<ProductDto> getById(Long id) {
+        Page<ProductDto> productPage = productRepository.findProductByIdIgnoreCase(Math.toIntExact(id)).map(ProductDto::new);
+        return productPage.getContent();
     }
 }
