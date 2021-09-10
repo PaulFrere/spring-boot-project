@@ -2,53 +2,61 @@ package ru.geekbrains.boot.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.boot.model.Product;
 import ru.geekbrains.boot.services.ProductService;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@RestController
 public class ProductController {
     @Autowired
     private ProductService productService;
 
     @GetMapping
-    public List<Product> getAll() {
-        return productService.getAll();
+
+    public Page<Product> getAllProducts(@PageableDefault(size = 10, page = 0, sort = "cost") Pageable pageable) {
+        return productService.getAllProducts(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
     }
 
-    @GetMapping("/cost_between")
-    public List<Product> getAllBetween(@RequestParam float first, @RequestParam float second) {
-        return productService.getAllByCostBetween(first, second);
+    @GetMapping(params = {"minCost", "maxCost"})
+    public Page<Product> getProductsBetweenCost(float minCost, float maxCost, Pageable pageable) {
+        return productService.getProductsBetweenCost(minCost, maxCost, pageable);
     }
 
-    @GetMapping("/cost_less")
-    public List<Product> getAllLess(@RequestParam float cost) {
-        return productService.getAllByCostIsLessThanEqual(cost);
+    @GetMapping(params = "titleContains")
+    public Page<Product> getProductByTitleContains(String titleContains, Pageable pageable) {
+        return productService.getProductByTitleContains(titleContains, pageable);
     }
 
-    @GetMapping("/cost_greater")
-    public List<Product> getAllGreater(@RequestParam float cost) {
-        return productService.getAllByCostGreaterThanEqual(cost);
+    @GetMapping(params = "minCost")
+    public Page<Product> getProductsMoreExpensiveThan(float minCost, Pageable pageable) {
+        return productService.getProductsExpensiveThan(minCost, pageable);
+    }
+
+    @GetMapping(params = "maxCost")
+    public Page<Product> getProductsCheaperThan(float maxCost, Pageable pageable) {
+        return productService.getProductsCheaperThan(maxCost, pageable);
     }
 
     @GetMapping("/{id}")
-    public Product getById(@PathVariable Long id) {
-        return productService.getById(id);
+    public Product getOneProduct(@PathVariable Long id) {
+        return productService.getProduct(id);
     }
 
 
     @PostMapping
-    public Product add(@RequestBody Product product) {
-        return productService.add(product);
+    public Product addProduct(@RequestBody Product product) {
+        return productService.addProduct(product);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        productService.delete(id);
+    public void deleteProduct(@RequestParam Long id) {
+        productService.deleteProduct(id);
     }
 }
