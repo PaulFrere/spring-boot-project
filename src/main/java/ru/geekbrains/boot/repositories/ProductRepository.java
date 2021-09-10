@@ -1,21 +1,15 @@
 package ru.geekbrains.boot.repositories;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import ru.geekbrains.boot.model.Product;
 
 import java.util.List;
 
-public interface ProductRepository {
-    void create(String title, float cost);
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    ru.geekbrains.boot.entities.Product get(int id);
+    List<Product> findProductsByCostBetween(float first, float second);
 
-    List<ru.geekbrains.boot.entities.Product> getAll();
+    List<Product> findProductByCostIsLessThanEqual(float cost);
 
-    void update(int id, String title, float cost);
-
-    void delete(int id);
-
-    void save(Product product);
-
-    void save(ru.geekbrains.boot.entities.Product product);
+    List<Product> findProductsByCostGreaterThanEqual(float cost);
 }

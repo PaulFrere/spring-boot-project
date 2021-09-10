@@ -1,58 +1,48 @@
 package ru.geekbrains.boot.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import ru.geekbrains.boot.entities.Product;
+import org.springframework.stereotype.Service;
+import ru.geekbrains.boot.model.Product;
 import ru.geekbrains.boot.repositories.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Service
 public class ProductService {
 
+    @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    public void setProductRepository(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
-
-    public void create(String title, float cost) {
-        productRepository.create(title, cost);
-    }
-
-    public void save(Product product) {
-        productRepository.save(product);
-    }
-
-    public Optional<ru.geekbrains.boot.model.Product> get(int id) {
-        return Optional.ofNullable(productRepository.get(id));
-    }
-
     public List<Product> getAll() {
-        return productRepository.getAll();
+        return productRepository.findAll();
     }
 
-    public void update(int id, String title, float cost) {
-        productRepository.update(id, title, cost);
+    public List<Product> getAllByCostBetween(float first, float second) {
+
+        return productRepository.findProductsByCostBetween(first, second);
     }
 
-    public void delete(int id) {
-        productRepository.delete(id);
+    public List<Product> getAllByCostIsLessThanEqual(float first) {
+
+        return productRepository.findProductByCostIsLessThanEqual(first);
     }
 
-    public int count() {
-        return getAll().size();
+    public List<Product> getAllByCostGreaterThanEqual(float first) {
+
+        return productRepository.findProductsByCostGreaterThanEqual(first);
     }
 
-    public float averageCost() {
-        List<Product> products = getAll();
-        float avg = 0;
-        for (Product product : products) {
-            avg += product.getCost();
-        }
-        return avg;
+    public Product getById(Long id) {
+        Optional<Product> product = productRepository.findById(id);
+        return product.orElse(null);
     }
 
+    public Product add(Product student) {
+        return productRepository.save(student);
+    }
+
+    public void delete(Long id) {
+        productRepository.deleteById(id);
+    }
 }
