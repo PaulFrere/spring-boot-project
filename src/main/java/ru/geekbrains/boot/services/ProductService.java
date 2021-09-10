@@ -1,18 +1,14 @@
 package ru.geekbrains.boot.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import ru.geekbrains.boot.model.Product;
+import ru.geekbrains.boot.entities.Product;
 import ru.geekbrains.boot.repositories.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Component
-@Service
-@RequiredArgsConstructor
 public class ProductService {
 
     private ProductRepository productRepository;
@@ -30,7 +26,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public Optional<Product> get(int id) {
+    public Optional<ru.geekbrains.boot.model.Product> get(int id) {
         return Optional.ofNullable(productRepository.get(id));
     }
 
@@ -50,8 +46,6 @@ public class ProductService {
         return getAll().size();
     }
 
-
-
     public float averageCost() {
         List<Product> products = getAll();
         float avg = 0;
@@ -60,4 +54,5 @@ public class ProductService {
         }
         return avg;
     }
+
 }
